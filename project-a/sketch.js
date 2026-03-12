@@ -8,7 +8,7 @@ let MS = 0.005;
 let Ms = 0.003;
 function setup() {
   let canvas = createCanvas(800, 500);
-  canvas.parent("p5-canvas-container");
+  //canvas.parent("p5-canvas-container");
   x = width / 2;
   y = height / 2;
   a = random(width);
@@ -36,9 +36,10 @@ function draw() {
   //飞蛾位置 location of the moth
   let t = map(dist(a, b, mouseX, mouseY), 0, 400, 300, 200);
 
-  if (mouseIsPressed == true) {
+  if (mouseIsPressed == true && checkKey() == false ) {
     // MS = lerp(MS, 0.01, 0.1);
     // Ms = lerp(Ms,0.006, 0.1);
+   
     MS = 0.01;
     Ms = 0.006;
     smalla = 0;
@@ -49,6 +50,9 @@ function draw() {
     R = map(sin(frameCount * 0.1), -1, 1, 10, 100);
     a1 = width / 2 + R * cos(frameCount * 0.05);
     b1 = height / 2 + R * sin(frameCount * 0.05);
+    
+    
+    
     let t = map(dist(a, b, mouseX, mouseY), 0, 400, 300, 200);
   } else if (
     (keyIsDown(72) && keyIsDown(73)) ||
@@ -93,7 +97,7 @@ function draw() {
   arc(width/2,height/2, 370,370,0,PI);
   
 
-  // 背景 background
+  //  Ring 背景 background
   translate(width / 2, height / 2);
   //rotate(PI)
   for (let ac = -10; ac < 10; ac += 4) {
@@ -102,7 +106,7 @@ function draw() {
     rotate(PI);
     //arc(0,ac,400+ac,400-ac,PI-PI/10+frameCount*0.01+ac,2*PI+PI/10+frameCount*0.01+ac)
     stroke(255)
-    arc(0,ac,600 + ac,200,PI - PI / 10 + frameCount * 0.01 + 2 * ac,2 * PI + PI / 10 + frameCount * 0.01 - ac);
+    arc(0,ac,600 + ac,200,PI - PI / 10 + frameCount * 0.01 + 2*ac,2 * PI + PI / 10 + frameCount * 0.01 - ac);
     pop();
   }
   //arc(0,0,600,200,PI-PI/10+frameCount*0.01,2*PI+PI/10+frameCount*0.05)
@@ -149,7 +153,7 @@ function draw() {
     let n = noise(frameCount * 0.3);
     nn = noise(frameCount);
     console.log(n);
-    if (mouseIsPressed == true) {
+    if (mouseIsPressed == true && checkKey() == false) {
       speed = 0.5;
     } else if (
       (keyIsDown(72) && keyIsDown(73)) ||
@@ -160,7 +164,7 @@ function draw() {
       speed = 0.1;
     }
 
-    if (mouseIsPressed == true) {
+    if (mouseIsPressed == true && checkKey() == false) {
       r = 100 + nn * 10;
       c1 = n * 10;
     } else {
@@ -170,7 +174,7 @@ function draw() {
 
     //翅膀 wings
     push();
-    if (mouseIsPressed == true) {
+    if (mouseIsPressed == true && checkKey() == false) {
       freq = 0.9;
       stroke(255, 255, 255, t);
     } else if (
@@ -190,7 +194,7 @@ function draw() {
     for (let i = 0; i < 65; i += 5) {
       let s = map(i, 0, 40, 100, 10); //smaller to bigger
       let w = map(i, 0, 40, 10, 100); //how long
-      let ww = 5 * sin(frameCount * freq + i * 0.1); //I just came up with this formula from experimentation
+      let ww = 5 * sin(frameCount * freq + i * 0.1); 
       circle(s - 100, ww, s);
       circle(w - 10, ww, s);
     }
@@ -222,7 +226,7 @@ function draw() {
     endShape();
     pop();
 
-    //飞蛾身体
+    //飞蛾身体 body
     push();
     translate(x, y);
     fill(255, 255, 255, t);
@@ -233,7 +237,7 @@ function draw() {
     //   arc(20,0,50*eye,50,0,PI-PI/4)
 
     //eyes
-    if (checkMouse() == true) {
+    if (checkMouse() == true && checkKey() == false) {
       fill(0);
       let eye = map(sin(frameCount * 0.1), -1, 1, 0.9, 1);
       arc(-20, n * 10, 50 * eye, 50, PI / 4, PI, CHORD);
@@ -275,10 +279,28 @@ function draw() {
 
     pop();
   }
-  push();
-
+  
   spaceMoth(a, b);
-  pop();
+  
+  if(mouseIsPressed && frameCount%60<40 && checkKey() == false){
+    push()
+    stroke(250)
+    textSize(20+sin(frameCount*0.1));
+    fill(250)
+    textAlign(CENTER,CENTER);
+    text("Press 'h' and 'i' to greet Space Moth!",width/2,height/2);
+
+    strokeWeight(2);
+    pop()
+  }
+  
+//   if(mouseIsPressed){
+//     for(let pam = 0; pam<2*PI; pam += PI/4){
+//       rotate(pam);
+//       circle()
+//     }
+//   }
+  
   if (keyIsPressed) {
     if (
       (keyIsDown(72) && keyIsDown(73)) ||
@@ -291,8 +313,17 @@ function draw() {
     }
   }
 
+  function checkKey(){
+    if (
+      (keyIsDown(72) && keyIsDown(73)) ||
+      (keyIsDown(104) && keyIsDown(105))){return true}
+    else{return false}
+      
+  }
+  
   function checkMouse() {
     if (mouseIsPressed == true) {
+      
       return true;
     } else {
       return false;
