@@ -8,7 +8,7 @@ let MS = 0.005;
 let Ms = 0.003;
 function setup() {
   let canvas = createCanvas(800, 500);
-  //canvas.parent("p5-canvas-container");
+  canvas.parent("p5-canvas-container");
   x = width / 2;
   y = height / 2;
   a = random(width);
