@@ -1,36 +1,46 @@
-//variables
-let k, x, y, newX, newY;
+let c = [];
+let r = [];
+let thunder;
+function preload() {
+  thunder = loadSound("thunder.mp3");
+}
 function setup() {
   createCanvas(400, 400);
-  //declaration of variables
-  k = "type something!";
-  x = random(width);
-  y = random(height);
-  newX = random(width);
-  newY = random(height);
+ // thunder.play(); //just to test
 }
-
+function mousePressed() {
+  c.push(new Cloud(mouseX, mouseY, random(0.5, 1)));
+}
 function draw() {
   background(220);
-  drawKey();
-  moveKey();
-}
-function keyPressed() {
-  //this will only happen once when we press a key
-  changeKey(key);
+  //if(mouseIsPressed){
+    //r.push(new Rain(mouseX, mouseY));
+  //}
+  for (let i = 0; i < r.length; i++) {
+    r[i].updateRain();
+    r[i].displayRain();
+    if(r[i].isOut){
+      r.splice(i, 1);
+    }
+  }
+ //console.log(r.length);
+
+  for (let i = 0; i < c.length; i++) {
+    for (let j = 0; j < c.length; j++) {
+      if (i != j) {
+        c[i].checkCollision(c[j]);
+      }
+    }
+    if (c[i].isRaining) {
+      r.push(new Rain(c[i].x, c[i].y), c[i].h);
+    }
+    c[i].update();
+    c[i].display();
+    if (c[i].isOut) {
+      c.splice(i, 1);
+    }
+
+  }
+  //console.log(c.length);
 }
 
-function drawKey() {
-  textSize(30);
-  textAlign(CENTER);
-  text(k, x, y);
-}
-function moveKey(){
-  x = lerp(x, newX, 0.1);
-  y = lerp(y, newY, 0.1);
-}
-function changeKey(newKey) {
-  k = newKey;
-  newX = random(width);
-  newY = random(height);
-}
