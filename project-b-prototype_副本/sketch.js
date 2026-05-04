@@ -9,15 +9,25 @@ let move = 0;
 let breathing;
 let myCharacter;
 let heavybreathe = false;
+let pix = [];
+let img = [];
+let opa = 300
+let p = [];
+let initialCount = 100;
+let timeCounter = 0;
 function preload() {
   breathing = loadSound("assets/breathing3.wav");
   handPose = ml5.handPose(options);
   rainbow = loadSound("assets/Rainbow.mp3");
   scared = loadSound("assets/Scared.mp3");
+
+  for (let i = 1; i < 3; i++) {
+    let fileName = 'images/' + i + '.PNG';
+    img.push(loadImage(fileName));
+  }
+
 }
 
-let p = [];
-let initialCount = 100;
 
 function setup() {
   createCanvas(800, 500);
@@ -27,44 +37,48 @@ function setup() {
   video.hide();
   myCharacter = new Character(width / 2, height / 2);
 
-  for (let i = 0; i < initialCount; i++) {
+  for (let u = 0; u < initialCount; u++) {
     p.push(new Particle(random(width), random(height)));
   }
+
+  for (let i = 0; i < img.length; i++) {
+    pix[i] = new Pix(img[i], i + 0.5);
+  }
+
+
 }
 function draw() {
+  background(0);
+  if (timeCounter % 100 == 0) {
+    console.log(timeCounter);
+  }
+
+  if (hands.length == 0) {
+    timeCounter++;
+  }
+  //let bright = random(150,200)
   if (mouseIsPressed) {
     handPose.detectStart(video, gotHands);
+    opa = 0
   }
   function gotHands(results) {
     hands = results;
   }
-  //Start detecting hands from the webcam video
 
-  // if(mouseIsPressed && scared.isPlaying() == false){
-  //   scared.play()
-  //   breathing.loop();
-  // }
-  //   if(frameCount>30){
-  //   breathing.loop();
-  // }
-  // background(4, 19, 43,p.length);
-  background(4, 19, 43);
-  drawWindow();
+  //background(4, 19, 43);
+  //drawWindow();
 
-  //   if(mouseIsPressed){
-  //     heavybreathe = true
-  //     if(heavybreathe == true){
-  //       breathe = map(p.length, 0,initialCount,0.1,0.7)
-  //     }
-  //   }
-
-  // let sh = map(p.length, 0,initialCount, 13,18)
+  for (let i = 0; i < img.length; i++) {
+    pix[i].update(pix[1]);
+    pix[i].display();
+  }
 
   push();
   translate(width, 0);
   scale(-1, 1);
   // Draw all the tracked hand points
   for (let i = 0; i < hands.length; i++) {
+    timeCounter = 0;
     let hand = hands[i];
     p1 = hand.keypoints[9];
 
@@ -77,6 +91,10 @@ function draw() {
       // ellipse(keypoint.x, keypoint.y, 20,40);
     }
   }
+
+  bright = map(p.length, initialCount, 0, random(100, 200), 0)
+
+  background(0, 0, 0, bright)
 
   for (let i = p.length - 1; i >= 0; i--) {
     p[i].drawParticle();
@@ -96,10 +114,10 @@ function draw() {
     if (heavybreathe == true && scared.isPlaying() == false) {
       scared.play();
       breathing.loop();
-      breathe = map(p.length, 0, initialCount, 0.1, 0.7);
+
     }
   }
-
+  breathe = map(p.length, 0, initialCount, 0.1, 0.7);
   //push();
 
   console.log(heavybreathe);
@@ -108,7 +126,7 @@ function draw() {
 
   //drawCharacter();
   //drawScene()
-  myCharacter.update(); // 更新数据
+  myCharacter.update();
   myCharacter.display();
   fill(255);
   noStroke();
@@ -117,7 +135,33 @@ function draw() {
   if (checkMusic() && rainbow.isPlaying() == false) {
     rainbow.play();
   }
+
+  background(0, 0, 0, opa)
 }
+
+class Pix {
+  constructor(pix, i) {
+    this.pix = pix; //add image
+    this.x = -this.pix.width / 2; //position
+    this.y = 0;
+    this.speedX = i; //speed for each image
+  }
+  display() {
+    image(this.pix, this.x, this.y);
+  }
+  update(other) {
+    //when mouse is on the right, move left
+    if (p1.x > width / 2 * 1.5 && (width - other.x) < other.pix.width) {
+      this.x = this.x - this.speedX;
+    }
+    //when mouse is on the left, move right
+    if (p1.x < width / 2 * 0.5 && other.x < other.pix.width / 2 - this.pix.width / 2) {
+      this.x = this.x + this.speedX;
+    }
+
+  }
+}
+
 
 class Particle {
   constructor(x, y) {
@@ -171,85 +215,7 @@ class Particle {
   }
 }
 
-// class Character {
-//   constructor(x, y) {
-//     this.x = x;
-//     this.y = y;
-//     this.skinColor = color(237, 208, 190, 10);
-//     this.eyeColor = color(100, 100, 100);
-//     this.decorationColor = color(247, 204, 87);
 
-//     // 初始化眼睛高度
-//     this.eyeHeight = 30;
-//   }
-
-//   update() {
-//     // 基础的眼珠左右跟随逻辑
-//     this.dx = map(p1.x, width, 0, this.x - 13, this.x + 13);
-
-//     // 关键修改：当 p.length < 1 时，根据手部高度 p1.y 改变眼睛高度
-//     if (p.length <= 1) {
-//       this.eyeHeight = map(p1.y, 0, height, 40, 2);
-//     } else {
-//       this.eyeHeight = 30; // 默认状态
-//     }
-//   }
-
-//   display() {
-//     push();
-//     translate(this.x - 200, this.y - 189);
-
-//     noStroke();
-//     fill(this.skinColor);
-//     circle(200, 189, 95);
-
-//     // --- 眼睛与睫毛 ---
-//     stroke(0);
-//     strokeWeight(5);
-//     fill(255);
-
-//     // 将 30 替换为 this.eyeHeight 实现动态高度
-//     ellipse(175, 180, 40, this.eyeHeight);
-//     ellipse(225, 180, 40, this.eyeHeight);
-
-//     // 眼珠高度也需要随之限制，防止“出框”
-//     fill(this.eyeColor);
-//     let pupilSize = min(20, this.eyeHeight * 0.6); // 确保眼珠不会比眼眶大
-//     circle(this.dx - 225, 180, pupilSize);
-//     circle(this.dx - 175, 180, pupilSize);
-
-//     // 如果眼睛闭得太紧，睫毛可以做点特殊处理（可选）
-//     if (this.eyeHeight > 10) {
-//       noFill();
-//       strokeWeight(4);
-//       line(140, 170, 155, 175);
-//       line(140, 175, 155, 180);
-//       line(245, 175, 260, 170);
-//       line(245, 170, 260, 165);
-//     }
-
-//     // --- 头发与其它部分 (保持不变) ---
-//     // ... 原有代码的头发、嘴部、鼻子等 ...
-//     // --- 嘴部/腮红 ---
-//     noStroke();
-//     fill(232, 146, 132, 200);
-//     circle(200, 200, 20);
-//     fill(247, 189, 153, 100);
-//     ellipse(170, 205, 30, 20);
-//     ellipse(230, 205, 30, 20);
-
-//     // --- 鼻子 ---
-//     stroke(10);
-//     strokeWeight(5);
-//     beginShape();
-//     vertex(200, 200);
-//     vertex(200, 205);
-//     vertex(205, 205);
-//     endShape(CLOSE);
-
-//     pop();
-//   }
-// }
 
 function drawWindow() {
   rectMode(CENTER);
@@ -272,28 +238,28 @@ class Character {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    // 默认眼睛参数
+    
     this.baseEye = 60;
     this.basePupil = 40;
     this.mouth = 0
   }
 
   update() {
-    if (p.length <= 60 ) {
+    if (p.length <= 60) {
       this.currentEye = this.baseEye
       this.currentPupil = this.basePupil;
       //  this.currentEye= map(sin(frameCount),-1,1, 60, 0);
       // this.currentPupil = map(sin(frameCount),-1,1, 40, 0);
       // this.currentEye= map(p1.y,0,height, 80, 0);
       // this.currentPupil = map(p1.y, 0,height, 50, 0);
-    } else if (p.length>60 && frameCount%20 ==0) {
-      this.currentEye= map(sin(frameCount),-1,1, 60, 0);
-      this.currentPupil = map(sin(frameCount),-1,1, 40, 0);
-      
-//       this.currentEye = this.baseEye
-//       this.currentPupil = this.basePupil;
+    } else if (p.length > 60 && frameCount % 20 == 0) {
+      this.currentEye = map(sin(frameCount), -1, 1, 60, 0);
+      this.currentPupil = map(sin(frameCount), -1, 1, 40, 0);
+
+      //       this.currentEye = this.baseEye
+      //       this.currentPupil = this.basePupil;
     }
-    this.lookX = map(p1.x, width, 0,  -10, 10);
+    this.lookX = map(p1.x, width, 0, -10, 10);
     this.lookY = map(
       p1.y,
       0,
@@ -301,7 +267,7 @@ class Character {
       -this.currentEye / 4,
       this.currentEye / 4
     );
-    this.mouth = map(p.length,100,0,0,100)
+    this.mouth = map(p.length, 100, 0, 0, 100)
   }
 
   display() {
@@ -335,8 +301,9 @@ class Character {
     noFill();
     arc(this.x - 30, this.y + 40, 40, 30, 0, PI / 2);
     arc(this.x + 30, this.y + 40, 40, 30, PI / 2, PI);
-    stroke(20,20,20,this.mouth)
-    arc(this.x , this.y + 110, 30, 30, PI/4,PI / 2+PI/4);
+    stroke(20, 20, 20, this.mouth)
+    arc(this.x, this.y + 110, 30, 30, PI / 4, PI / 2 + PI / 4);
     pop();
   }
 }
+
