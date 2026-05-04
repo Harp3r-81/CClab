@@ -30,10 +30,12 @@ function preload() {
 
 
 function setup() {
-  createCanvas(800, 500);
+  
+  let canvas = createCanvas(800,500)
+  canvas.parent("p5-canvas-container");
   //breathing.loop();
   video = createCapture(VIDEO);
-  video.size(800, 500);
+  video.size(900, 600);
   video.hide();
   myCharacter = new Character(width / 2, height / 2);
 
@@ -49,13 +51,23 @@ function setup() {
 }
 function draw() {
   background(0);
-  if (timeCounter % 100 == 0) {
-    console.log(timeCounter);
-  }
 
-  if (hands.length == 0) {
+  if (hands.length === 0) {
     timeCounter++;
+    if (timeCounter % 100 === 0) {
+      p.push(new Particle(random(width), random(height)));
+    }
+  } else {
+    timeCounter = 0; 
   }
+  // if (timeCounter % 100 == 0) {
+  //   console.log(timeCounter);
+  //   p.push(new Particle(random(width), random(height)));
+  // }
+
+  // if (hands.length == 0) {
+  //   timeCounter++;
+  // }
   //let bright = random(150,200)
   if (mouseIsPressed) {
     handPose.detectStart(video, gotHands);
