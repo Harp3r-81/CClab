@@ -52,14 +52,14 @@ function setup() {
 function draw() {
   background(0);
 
-  if (hands.length === 0) {
-    timeCounter++;
-    if (timeCounter % 100 === 0) {
-      p.push(new Particle(random(width), random(height)));
-    }
-  } else {
-    timeCounter = 0; 
-  }
+  // if (hands.length == 0) {
+  //   timeCounter++;
+  //   if (timeCounter % 100 == 0) {
+  //     p.push(new Particle(random(width), random(height)));
+  //   }
+  // } else {
+  //   timeCounter = 0; 
+  // }
   // if (timeCounter % 100 == 0) {
   //   console.log(timeCounter);
   //   p.push(new Particle(random(width), random(height)));
