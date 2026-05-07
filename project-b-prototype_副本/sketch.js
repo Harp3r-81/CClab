@@ -15,11 +15,18 @@ let opa = 300
 let p = [];
 let initialCount = 100;
 let timeCounter = 0;
+let playamp;
+let musicCounter = 0;
+let addnew = true;
+let opa2 = 0
+let opa2Counter = 0;
+let textAlpha = 0
 function preload() {
   breathing = loadSound("assets/breathing3.wav");
   handPose = ml5.handPose(options);
   rainbow = loadSound("assets/Rainbow.mp3");
   scared = loadSound("assets/Scared.mp3");
+  thanks = loadImage("assets/thx.png")
 
   for (let i = 1; i < 3; i++) {
     let fileName = 'images/' + i + '.PNG';
@@ -46,7 +53,7 @@ function setup() {
   for (let i = 0; i < img.length; i++) {
     pix[i] = new Pix(img[i], i + 0.5);
   }
-
+ 
 
 }
 function draw() {
@@ -59,15 +66,47 @@ function draw() {
   //   }
   // } else {
   //   timeCounter = 0; 
-  // }
-  // if (timeCounter % 100 == 0) {
-  //   console.log(timeCounter);
-  //   p.push(new Particle(random(width), random(height)));
-  // }
+  
+  if (addnew == true && timeCounter % 100 == 0 && hands.length == 0) {
+    //console.log(timeCounter);
+    p.push(new Particle(random(width), random(height)));
+    textAlpha = 255
+  }
+  
+  
 
-  // if (hands.length == 0) {
-  //   timeCounter++;
-  // }
+    
+
+
+ 
+  if (hands.length == 0) {
+    timeCounter++;
+  }
+  else if (hands.length == 1){
+    timeCounter = 0 
+  }
+   
+
+  if (hands.length == 1 && p.length <10){
+    musicCounter++
+  }else if(hands.length == 0 || p.length>=10){
+    musicCounter = 0
+  }
+
+  if(musicCounter>500 && rainbow.isPlaying() == false){
+    rainbow.play() 
+    addnew = false
+  }
+
+if(addnew == false){
+  opa2Counter++
+  opa2 = map(opa2Counter,0,2000,0,255)
+}
+
+
+
+  console.log(opa2Counter)
+  console.log(addnew)
   //let bright = random(150,200)
   if (mouseIsPressed) {
     handPose.detectStart(video, gotHands);
@@ -96,7 +135,12 @@ function draw() {
 
     for (let j = 0; j < hand.keypoints.length; j++) {
       let keypoint = hand.keypoints[j];
-      text(j, keypoint.x, keypoint.y);
+      //text(j, keypoint.x, keypoint.y);
+      push()
+      stroke(255)
+      fill(255,255,255,20)
+      circle(keypoint.x, keypoint.y, 30)
+      pop()
 
       // fill(255,255,255,20);
       // noStroke();
@@ -104,7 +148,8 @@ function draw() {
     }
   }
 
-  bright = map(p.length, initialCount, 0, random(100, 200), 0)
+  bright = map(p.length, initialCount, 0, random(200, 250), 0)
+//console.log(hands.length)
 
   background(0, 0, 0, bright)
 
@@ -132,7 +177,7 @@ function draw() {
   breathe = map(p.length, 0, initialCount, 0.1, 0.7);
   //push();
 
-  console.log(heavybreathe);
+  //console.log(heavybreathe);
   //let p1 = hands[9]
   pop();
 
@@ -144,11 +189,48 @@ function draw() {
   noStroke();
   text(p.length, 20, 30);
 
-  if (checkMusic() && rainbow.isPlaying() == false) {
-    rainbow.play();
-  }
+  if (textAlpha > 0 && addnew == true) {
+  fill(255, 255, 255, textAlpha); 
+  //text('wait...', 30, 40);
+   text('I cant deal with this on my own...', 30, 60);
+    text('please keep me company', 30, 80);
+  textAlpha -= random(1,4); 
+}
+
+
+
+
+  playamp = map(p.length,0,100,1,0) 
+
+  // if (checkMusic() && rainbow.isPlaying() == false) {
+    
+  //   rainbow.play();
+  //   rainbow.amp(playamp)
+  // } 
 
   background(0, 0, 0, opa)
+  if(addnew == false){
+ background(0,0,0,opa2)
+  }
+if(2000>opa2Counter>1500){
+  text('Thank you, friend...', width/2-40,height/2);
+  text('Good Night', width/2-40,height/2+20);
+  image(thanks, width/2-40, height/2)
+}
+
+if(opa2Counter>2000){
+  text('a project for my parents', width/2-40,height/2);
+  text('i love you... wish yall sweet dreams', width/2-40,height/2+20);
+  text('and...for octave fusion', width/2-40,height/2+40);
+  text('...good night', width/2-40,height/2+60);
+  
+}
+
+if(opa2Counter>3000){
+  text('...a message from Harper Zou, 2026.5.8', width/2-40,height/2+100);
+  
+}
+ 
 }
 
 class Pix {
@@ -215,7 +297,7 @@ class Particle {
     this.x += this.speedX;
     this.y += this.speedY;
 
-    let margin = this.r;
+    let margin = this.r-20;
     if (
       this.x < -margin ||
       this.x > width + margin ||
@@ -276,8 +358,8 @@ class Character {
       p1.y,
       0,
       height,
-      -this.currentEye / 4,
-      this.currentEye / 4
+      -this.currentEye / 8,
+      this.currentEye / 8
     );
     this.mouth = map(p.length, 100, 0, 0, 100)
   }
