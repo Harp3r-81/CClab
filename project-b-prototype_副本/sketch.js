@@ -212,13 +212,13 @@ if(addnew == false){
   if(addnew == false){
  background(0,0,0,opa2)
   }
-if(2000>opa2Counter>1500){
-  text('Thank you, friend...', width/2-40,height/2);
-  text('Good Night', width/2-40,height/2+20);
+if(opa2Counter>1500){
+  text('Thank you, friend...', width/2-40,height/2-40);
+  text('Good Night', width/2-40,height/2-20);
   image(thanks, width/2-40, height/2)
 }
 
-if(opa2Counter>2000){
+if(opa2Counter>3000){
   text('a project for my parents', width/2-40,height/2);
   text('i love you... wish yall sweet dreams', width/2-40,height/2+20);
   text('and...for octave fusion', width/2-40,height/2+40);
@@ -226,7 +226,7 @@ if(opa2Counter>2000){
   
 }
 
-if(opa2Counter>3000){
+if(opa2Counter>4000){
   text('...a message from Harper Zou, 2026.5.8', width/2-40,height/2+100);
   
 }
